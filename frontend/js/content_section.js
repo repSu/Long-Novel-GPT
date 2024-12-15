@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 在 showRevisionAreas 函数前添加这个新函数
+    // 在 showRevisionAreas 函数前添加这个新函��
     function handleBatchRevision(accept) {
         // 获取所有可见的revision items对应的chunks
         const visibleRevisions = document.querySelectorAll('.revision-item.visible');
@@ -72,6 +72,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // 更新按钮文本
     function updateActionButtonText() {
         actionBtn.textContent = isWriting ? '取消创作' : '开始创作';
+    }
+
+    // 获取当前选中的分卷和章节
+    function getSelectedChapter() {
+        const chapterSelect = document.getElementById('chapterSelect');
+        const chapter = parseInt(chapterSelect.value);
+        return { chapter };
+    }
+
+    // 更新章节显示
+    function updateChapterDisplay(chunk) {
+        return `第${chunk.chapter}章`;
     }
 
     // 添加新的函数来处理端请求
@@ -96,6 +108,7 @@ document.addEventListener('DOMContentLoaded', () => {
             // Get selected model provider
             const modelProvider = document.querySelector('.model-select').value;
             
+            const { volume } = getSelectedChapter();
             const requestData = {
                 writer_mode: writerMode,
                 chunk_list: allChunks,
@@ -104,7 +117,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 x_chunk_length: x_chunk_length,
                 y_chunk_length: y_chunk_length,
                 model_provider: modelProvider,
-                global_context: writerMode !== 'draft' ? document.querySelector('.left-panel-input').value : ''
+                global_context: writerMode !== 'draft' ? document.querySelector('.left-panel-input').value : '',
+                volume: volume,
+                mode: document.getElementById('writeMode').value,
+                prompt_name: document.querySelector('.dropdown-group select').value,
+                context_window: parseInt(document.querySelector('.context-window-select').value),
             };
             
             const response = await fetch(`${window._env_?.SERVER_URL}/write`, {
@@ -169,7 +186,7 @@ document.addEventListener('DOMContentLoaded', () => {
             isWriting = false;
             updateActionButtonText();
             
-            // 中止当前的请求
+            // 中当前的请求
             if (currentController) {
                 currentController.abort();
             }
@@ -201,10 +218,10 @@ document.addEventListener('DOMContentLoaded', () => {
             lastSelectedIndex = allChunks.length - 1;
             
             showToast('已自动选择所有内容', 'info');     
-            // showToast('请先选择要创作的内容', 'warning');
+            // showToast('请先选���要创作的内容', 'warning');
         }
 
-        // 验证chunks连续性
+        // 证chunks连续性
         const allChunks = Array.from(document.querySelectorAll('.chunk-container'));
         const firstIndex = allChunks.indexOf(selectedChunks[0]);
         const lastIndex = allChunks.indexOf(selectedChunks[selectedChunks.length - 1]); 
@@ -404,5 +421,153 @@ document.addEventListener('DOMContentLoaded', () => {
     // 将handleModeChange暴露给外部
     window.handleContentModeChange = handleModeChange;
 
+    // 添加触摸事件支持
+    function initTouchEvents() {
+        let touchStartX = 0;
+        let touchStartY = 0;
+        
+        document.addEventListener('touchstart', (e) => {
+            touchStartX = e.touches[0].clientX;
+            touchStartY = e.touches[0].clientY;
+        }, { passive: true });
+
+        document.addEventListener('touchmove', (e) => {
+            if (Math.abs(e.touches[0].clientY - touchStartY) > 
+                Math.abs(e.touches[0].clientX - touchStartX)) {
+                e.stopPropagation();
+            }
+        }, { passive: true });
+    }
+
+    // 初始化分卷和章节选择
+    function initVolumeChapterSelection() {
+        const volumeSelect = document.getElementById('volumeSelect');
+        const chapterSelect = document.getElementById('chapterSelect');
+
+        // 存储每卷的章节信息
+        const volumeChapters = {
+            1: { count: 10, title: '第一卷' },
+            2: { count: 8, title: '第二卷' },
+            3: { count: 12, title: '第三卷' },
+            4: { count: 15, title: '第四卷' },
+            5: { count: 10, title: '第五卷' }
+        };
+
+        // 更新章节选项
+        function updateChapterOptions(volumeId) {
+            chapterSelect.innerHTML = ''; // 清空现有选项
+            
+            if (!volumeId) {
+                // 如果没有选择分卷，显示提示并禁用章节选择
+                const option = document.createElement('option');
+                option.value = '';
+                option.textContent = '请先选择分卷';
+                chapterSelect.appendChild(option);
+                chapterSelect.disabled = true;
+                return;
+            }
+
+            // 启用章节选择
+            chapterSelect.disabled = false;
+            
+            // 添加默认选项
+            const defaultOption = document.createElement('option');
+            defaultOption.value = '';
+            defaultOption.textContent = '请选择章节';
+            chapterSelect.appendChild(defaultOption);
+
+            // 添加该分卷下的所有章节
+            const volumeInfo = volumeChapters[volumeId];
+            for (let i = 1; i <= volumeInfo.count; i++) {
+                const option = document.createElement('option');
+                option.value = i;
+                option.textContent = `第${i}章`;
+                chapterSelect.appendChild(option);
+            }
+        }
+
+        // 监听分卷选择变化
+        volumeSelect.addEventListener('change', (e) => {
+            const selectedVolume = e.target.value;
+            updateChapterOptions(selectedVolume);
+            
+            // 清空章节选择
+            chapterSelect.value = '';
+            
+            // 如果正在创作，不允许切换
+            if (isWriting) {
+                showToast('正在创作中，请先完成或取消当前创作', 'warning');
+                return;
+            }
+        });
+
+        // 监听章节选择变化
+        chapterSelect.addEventListener('change', async (e) => {
+            const selectedChapter = e.target.value;
+            const selectedVolume = volumeSelect.value;
+            
+            if (!selectedVolume || !selectedChapter) {
+                return;
+            }
+
+            // 如果正在创作，不允许切换
+            if (isWriting) {
+                showToast('正在创作中，请先完成或取消当前创作', 'warning');
+                e.target.value = ''; // 重置选择
+                return;
+            }
+
+            try {
+                // 这里添加加载对应卷章内容的逻辑
+                const response = await fetch(`${window._env_?.SERVER_URL}/load_chapter`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        volume: selectedVolume,
+                        chapter: selectedChapter
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('加载章节失败');
+                }
+
+                const data = await response.json();
+                // 更新界面内容
+                // TODO: 实现updateContent函数来更新界面显示
+                updateContent(data);
+            } catch (error) {
+                console.error('Error loading chapter:', error);
+                showToast('加载章节内容失败', 'error');
+            }
+        });
+
+        // 初始化时禁用章节选择
+        updateChapterOptions('');
+    }
+
+    // 更新内容显示
+    function updateContent(data) {
+        // 清空现有内容
+        const chunkContainer = document.getElementById('chunkContainer');
+        chunkContainer.innerHTML = '';
+
+        // 添加新内容
+        if (data.chunks && data.chunks.length > 0) {
+            data.chunks.forEach(chunk => {
+                const newChunk = createNewChunk(chunk.x, chunk.y);
+                chunkContainer.appendChild(newChunk);
+            });
+        } else {
+            // 如果没有内容，创建一个空的chunk
+            const emptyChunk = createNewChunk('', '');
+            chunkContainer.appendChild(emptyChunk);
+        }
+    }
+
     initializeEventListeners();
+    initTouchEvents();
+    initVolumeChapterSelection();
 }); 

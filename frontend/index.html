@@ -2,7 +2,7 @@
 <html lang="zh">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Long-Novel-GPT</title>
     <link rel="stylesheet" href="styles/tooltip.css">
     <link rel="stylesheet" href="styles/toast.css">
@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="styles/chat_messages.css">
     <link rel="stylesheet" href="styles/examples.css">
     <link rel="stylesheet" href="styles/guide.css">
-    <script>window._env_ = window._env_ || {}; window._env_.SERVER_URL = "/api" || "http://127.0.0.1:7869";</script>
+    <script>window._env_ = window._env_ || {}; window._env_.SERVER_URL =  "http://127.0.0.1:7869";</script>
 </head>
 <body>
     <div class="container">
@@ -71,7 +71,7 @@
                     <div class="select-wrapper" title="选择使用的AI模型">
                         <select class="model-select">
                             <option value="zhipuai">GLM4(智谱)</option>
-                            <option value="gpt">GPT4(OpenAI)</option>
+                            <option value="gpt" selected>GPT4(OpenAI)</option>
                             <option value="others">Claude3.5(Anthropic)</option>
                             <option value="wenxin">文心4(百度)</option>
                             <option value="doubao">豆包Pro(字节跳动)</option>
@@ -83,7 +83,7 @@
                 <textarea placeholder="输入你的Prompt..."></textarea>
             </div>
         </div>
-        <div class="guide-section">
+        <div class="guide-section collapsed">
             <div class="guide-header">
                 <h3>使用指南</h3>
                 <button class="toggle-guide">
@@ -95,7 +95,7 @@
                     <h4>快捷操作</h4>
                     <ul>
                         <li><span class="key-combo">单击</span> 选中需要创作的文本块</li>
-                        <li><span class="key-combo">Ctrl + 点击</span> 多选文本块进行批量操作</li>
+                        <li><span class="key-combo">Ctrl + 点击</span> 多选文本块进行批操作</li>
                         <li><span class="key-combo">Shift + 点击</span> 选择连续的文本块</li>
                         <li>点击<span class="key-combo">▼</span>可以折叠使用指南和创作示例</li>
                     </ul>

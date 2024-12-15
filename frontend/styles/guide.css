@@ -98,4 +98,28 @@
 
 .guide-section.collapsed .guide-header {
     margin-bottom: 0;
+}
+
+/* 使用指南响应式布局 */
+@media screen and (max-width: 768px) {
+    .guide-container {
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    .guide-item {
+        padding: 10px;
+    }
+
+    .guide-item h4 {
+        font-size: 14px;
+    }
+
+    .guide-item li {
+        font-size: 12px;
+    }
+
+    .key-combo {
+        padding: 1px 4px;
+    }
 } 

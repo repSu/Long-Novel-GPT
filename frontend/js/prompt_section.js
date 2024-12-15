@@ -498,6 +498,81 @@ function updateChapterSelect(chunks) {
     });
 }
 
+// 添加模式选择的折叠菜单功能
+function initModeTabs() {
+    const modeTabs = document.querySelector('.mode-tabs');
+    const tabs = modeTabs.querySelectorAll('.mode-tab');
+    
+    function handleResize() {
+        if (window.innerWidth <= 360) {
+            enableFoldableMenu();
+        } else {
+            disableFoldableMenu();
+        }
+    }
+
+    function enableFoldableMenu() {
+        disableFoldableMenu();
+        
+        // 为所有标签添加点击事件
+        tabs.forEach(tab => {
+            tab.addEventListener('click', handleTabClick);
+        });
+        
+        document.addEventListener('click', closeMenuOnClickOutside);
+    }
+
+    function disableFoldableMenu() {
+        tabs.forEach(tab => {
+            tab.removeEventListener('click', handleTabClick);
+        });
+        document.removeEventListener('click', closeMenuOnClickOutside);
+        modeTabs.classList.remove('expanded');
+    }
+
+    function handleTabClick(e) {
+        e.stopPropagation();
+        const clickedTab = e.target;
+        
+        if (clickedTab.classList.contains('active')) {
+            // 如果点击的是当前活动标签，切换展开/折叠状态
+            modeTabs.classList.toggle('expanded');
+            return;
+        }
+
+        // 如果菜单未展开且点击的不是活动标签，先展开菜单
+        if (!modeTabs.classList.contains('expanded')) {
+            modeTabs.classList.add('expanded');
+            return;
+        }
+
+        // 处理标签切换
+        if (!clickedTab.classList.contains('active')) {
+            // 更新活动标签
+            tabs.forEach(tab => tab.classList.remove('active'));
+            clickedTab.classList.add('active');
+            
+            // 触发模式切换
+            const event = new Event('change');
+            document.getElementById('writeMode').value = clickedTab.dataset.value;
+            document.getElementById('writeMode').dispatchEvent(event);
+            
+            // 不自动折叠菜单，让用户可以继续选择
+            // modeTabs.classList.remove('expanded');
+        }
+    }
+
+    function closeMenuOnClickOutside(e) {
+        if (!modeTabs.contains(e.target)) {
+            modeTabs.classList.remove('expanded');
+        }
+    }
+
+    // 初始化
+    handleResize();
+    window.addEventListener('resize', handleResize);
+}
+
 // Initialize when DOM is loaded
 document.addEventListener('DOMContentLoaded', () => {
     initModeHandlers();
@@ -507,5 +582,6 @@ document.addEventListener('DOMContentLoaded', () => {
     initExamplesSection();
     initGuideSection();
     initChapterSelection();
+    initModeTabs();
 }); 
 

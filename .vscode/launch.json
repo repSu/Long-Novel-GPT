@@ -4,6 +4,13 @@
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
     "version": "0.2.0",
     "configurations": [
+        {
+            "name": "openai_api",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/llm_api/openai_api.py",
+            "console": "integratedTerminal"
+        },
         // python -m core.frontend
         {
             "name": "Backend",
@@ -16,7 +23,8 @@
                 "BACKEND_PORT": "7869",
                 "FRONTEND_PORT": "9999"
             }
-        },{
+        },
+        {
             "name": "Test",
             "type": "debugpy",
             "request": "launch",

@@ -120,4 +120,36 @@
 
 .examples-section.collapsed .examples-header {
     margin-bottom: 0;
+}
+
+/* 示例卡片响应式布局 */
+@media screen and (max-width: 768px) {
+    .examples-container {
+        gap: 10px;
+    }
+
+    .example-card {
+        width: 160px;
+        padding: 10px;
+    }
+
+    .example-card h4 {
+        font-size: 14px;
+    }
+
+    .example-card p {
+        font-size: 12px;
+    }
+}
+
+/* 触摸设备滚动优化 */
+@media (hover: none) {
+    .examples-container {
+        -webkit-overflow-scrolling: touch;
+        scroll-snap-type: x mandatory;
+    }
+
+    .example-card {
+        scroll-snap-align: start;
+    }
 } 
