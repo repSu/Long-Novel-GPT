@@ -24,6 +24,16 @@
                 "FRONTEND_PORT": "9999"
             }
         },
+        // python -m http.server -d frontend
+        {
+            "name": "Frontend",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "http.server",
+            "args": ["-d", "${workspaceFolder}/frontend"],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
         {
             "name": "Test",
             "type": "debugpy",
