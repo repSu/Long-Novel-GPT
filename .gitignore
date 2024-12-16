@@ -28,6 +28,7 @@ __pycache__/
 *$py.class
 venv/
 .venv/
+*_test.py
 
 # Node
 node_modules/
