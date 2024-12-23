@@ -86,6 +86,7 @@ const WINDOW_SIZES = {
         { x: 1000, y: 2000, label: '2千字' }
     ],
     'draft': [
+        { x: 100, y: 300, label: '3百字' },
         { x: 250, y: 500, label: '5百字' },
         { x: 500, y: 1000, label: '1千字' },
         { x: 1000, y: 2000, label: '2千字' },

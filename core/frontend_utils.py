@@ -62,7 +62,7 @@ def init_writer(idea, check_empty=True):
     chunk_length = dict(
         outline_w = [4_000, ],
         chapters_w = [500, 200, 1000, 2000],
-        draft_w = [1000, 500, 2000, 3000],
+        draft_w = [1000, 300, 500, 2000, 3000],
     )
 
     writer = dict(

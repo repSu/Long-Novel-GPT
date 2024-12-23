@@ -1,10 +1,10 @@
 import difflib
-import json
 import yaml
 from jinja2 import Environment, FileSystemLoader  
 
 import re
 import sys, os
+import json5
 root_path = os.path.abspath(os.path.join(os.path.abspath(__file__), "../.."))
 if root_path not in sys.path:
     sys.path.append(root_path)
@@ -13,7 +13,7 @@ from llm_api.chat_messages import ChatMessages
 
 def can_parse_json(response):
     try:
-        json.loads(response)
+        json5.loads(response)
         return True
     except:
         return False
@@ -22,28 +22,47 @@ def match_first_json_block(response):
     if can_parse_json(response):
         return response
     
-    pattern = r"(?<=[\r\n])```json(.*?)```(?=[\r\n])"
-    matches = re.findall(pattern, '\n' + response + '\n', re.DOTALL)
-    if not matches:
-        pattern = r"(?<=[\r\n])```(.*?)```(?=[\r\n])"
+    # json匹配的几个规则
+    patternList = [
+        # 匹配markdown代码块
+        r"(?<=[\r\n])```json(.*?)```",
+        r"(?<=[\r\n])```(.*?)```",
+        # 匹配非markdown json块, 
+        r"({(?=[\r\n])(.*?)}(?=[\r\n]))",
+        # 匹配非markdown json块, 
+        r"\[(?=[\r\n])(.*?)(?=[\r\n])\]",
+    ]
+
+    # 遍历patternList, 任意一个匹配成功则返回，如果全部匹配失败则抛出异常
+    for pattern in patternList:
         matches = re.findall(pattern, '\n' + response + '\n', re.DOTALL)
-        
+        if matches:
+            break
+      
     if matches:
         json_block = matches[0]
         if can_parse_json(json_block):
             return json_block
         else:
-            json_block = json_block.replace('\r\n', '')  # 在continue generate情况下，不同部分之间可能有多出的换行符，导致合起来之后json解析失败
+            # 在continue generate情况下，不同部分之间可能有多出的换行符，导致合起来之后json解析失败
+            json_block = json_block.replace('\r\n', '')
+            # 删除json中的注释后再删除所有换行
+            json_block = re.sub(r'//.*', '', json_block)
+            json_block = json_block.replace('\n', '')
+            # 删除空格中间和两端的空格
+            json_block = json_block.replace(' ', '').strip()
             if can_parse_json(json_block):
                 return json_block
             else:
-                raise Exception(f"无法解析JSON代码块")
+                estring = "无法解析JSON代码块:\n" + json_block + "\nContext:\n" + response
+                raise Exception(estring)
     else:
-        raise Exception(f"没有匹配到JSON代码块")
+        estring = "没有匹配到JSON代码块\n" + response
+        raise Exception(estring)
     
 def parse_first_json_block(response_msgs: ChatMessages):
     assert response_msgs[-1]['role'] == 'assistant'
-    return json.loads(match_first_json_block(response_msgs[-1]['content']))
+    return json5.loads(match_first_json_block(response_msgs[-1]['content']))
 
 def match_code_block(response):
     response = re.sub(r'\r\n', r'\n', response)
@@ -53,7 +72,7 @@ def match_code_block(response):
     return matches
 
 def json_dumps(json_object):
-    return json.dumps(json_object, ensure_ascii=False, indent=1)
+    return json5.dumps(json_object, ensure_ascii=False, indent=1)
 
 def parse_chunks_by_separators(string, separators):
     separator_pattern = r"^\s*###\s*(" + "|".join(separators) + r")\s*\n"
