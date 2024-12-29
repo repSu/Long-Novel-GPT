@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // 在 showRevisionAreas 函数前添加这个新函��
+    // 在 showRevisionAreas 函数前添加这个新函数
     function handleBatchRevision(accept) {
         // 获取所有可见的revision items对应的chunks
         const visibleRevisions = document.querySelectorAll('.revision-item.visible');
@@ -123,6 +123,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 prompt_name: document.querySelector('.dropdown-group select').value,
                 context_window: parseInt(document.querySelector('.context-window-select').value),
             };
+
+            // 如果供应商时gpt，则进一步获取模型
+            if (modelProvider === 'openai') {
+                const modle = document.querySelector('.openai-model-select').value;
+                requestData.model_provider = modelProvider + '#' + modle;
+            }
             
             const response = await fetch(`${window._env_?.SERVER_URL}/write`, {
                 method: 'POST',
@@ -218,7 +224,7 @@ document.addEventListener('DOMContentLoaded', () => {
             lastSelectedIndex = allChunks.length - 1;
             
             showToast('已自动选择所有内容', 'info');     
-            // showToast('请先选���要创作的内容', 'warning');
+            // showToast('请先选择要创作的内容', 'warning');
         }
 
         // 证chunks连续性
@@ -478,13 +484,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
             // 添加该分卷下的所有章节
             const volumeInfo = volumeChapters[volumeId];
-            for (let i = 1; i <= volumeInfo.count; i++) {
-                const option = document.createElement('option');
-                option.value = i;
-                option.textContent = `第${i}章`;
-                chapterSelect.appendChild(option);
+                for (let i = 1; i <= volumeInfo.count; i++) {
+                    const option = document.createElement('option');
+                    option.value = i;
+                    option.textContent = `第${i}章`;
+                    chapterSelect.appendChild(option);
+                }
             }
-        }
 
         // 监听分卷选择变化
         volumeSelect.addEventListener('change', (e) => {

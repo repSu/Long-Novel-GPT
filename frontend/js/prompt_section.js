@@ -202,6 +202,24 @@ function initModeHandlers() {
 function initPromptHandlers() {
     const promptSelect = document.querySelector('.prompt-actions .select-wrapper select');
     const writeMode = document.getElementById('writeMode');
+    const modelSelect = document.querySelector('.model-select');
+    const openaiModelsDiv = document.querySelector('.openai-models');
+    const openaiModelSelect = document.querySelector('.openai-model-select');
+
+    // 处理模型选择变化
+    modelSelect.addEventListener('change', function(e) {
+        const selectedModel = e.target.value;
+        if (selectedModel === 'openai') {
+            openaiModelsDiv.style.display = 'inline-block';
+        } else {
+            openaiModelsDiv.style.display = 'none';
+        }
+    });
+
+    // 初始化时检查是否选择了OpenAI
+    if (modelSelect.value === 'openai') {
+        openaiModelsDiv.style.display = 'inline-block';
+    }
 
     fetchPrompts().then(data => {
         prompts = data;

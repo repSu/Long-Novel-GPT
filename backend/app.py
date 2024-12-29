@@ -35,11 +35,23 @@ def health_check():
 
 
 def load_novel_writer(writer_mode, chunk_list, global_context, x_chunk_length, y_chunk_length, model_provider) -> DraftWriter:
-    kwargs = dict(
-        xy_pairs=chunk_list,
-        model=get_model_config_from_settings(model_provider, 'main'),
-        sub_model=get_model_config_from_settings(model_provider, 'sub'),
-    )
+    if 'openai' in model_provider:
+        model_provider, model_type = model_provider.split('#')
+        provider_config = API_SETTINGS["gpt"]
+        model_config = {**provider_config, 'model': model_type}
+        modelMain = ModelConfig(**model_config)
+        kwargs = dict(
+            xy_pairs=chunk_list,
+            model=modelMain,
+            sub_model=modelMain,
+        )
+    else:
+        kwargs = dict(
+            xy_pairs=chunk_list,
+            model=get_model_config_from_settings(model_provider, model_type),
+            sub_model=get_model_config_from_settings(model_provider, 'sub'),
+        )
+    
 
     kwargs['x_chunk_length'] = x_chunk_length
     kwargs['y_chunk_length'] = y_chunk_length
