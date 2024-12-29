@@ -447,7 +447,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // 初始化分卷和章节选择
     function initVolumeChapterSelection() {
-        const volumeSelect = document.getElementById('volumeSelect');
+        // const volumeSelect = document.getElementById('volumeSelect');
         const chapterSelect = document.getElementById('chapterSelect');
 
         // 存储每卷的章节信息
@@ -493,19 +493,19 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
         // 监听分卷选择变化
-        volumeSelect.addEventListener('change', (e) => {
-            const selectedVolume = e.target.value;
-            updateChapterOptions(selectedVolume);
+        // volumeSelect.addEventListener('change', (e) => {
+        //     const selectedVolume = e.target.value;
+        //     updateChapterOptions(selectedVolume);
             
-            // 清空章节选择
-            chapterSelect.value = '';
+        //     // 清空章节选择
+        //     chapterSelect.value = '';
             
-            // 如果正在创作，不允许切换
-            if (isWriting) {
-                showToast('正在创作中，请先完成或取消当前创作', 'warning');
-                return;
-            }
-        });
+        //     // 如果正在创作，不允许切换
+        //     if (isWriting) {
+        //         showToast('正在创作中，请先完成或取消当前创作', 'warning');
+        //         return;
+        //     }
+        // });
 
         // 监听章节选择变化
         chapterSelect.addEventListener('change', async (e) => {
