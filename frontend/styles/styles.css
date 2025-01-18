@@ -908,4 +908,56 @@ header h2 {
 .chapter-selection select:hover {
     border-color: #999;
 }
- 
+
+/* 针对小屏幕的优化 */
+@media screen and (max-width: 480px) {
+    .container {
+        padding: 5px;
+    }
+
+    .column-headers {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .left-header, .right-header {
+        width: 100%;
+    }
+
+    .copy-btn {
+        padding: 4px 6px;
+        font-size: 10px;
+    }
+
+    .chunk-container {
+        flex-direction: column;
+        padding: 5px;
+        border-left: 3px solid #3498db;
+        margin-bottom: 10px;
+    }
+
+    .x-input, .y-input, .revision-input {
+        font-size: 14px;
+        padding: 8px;
+        border: 1px solid #ddd;
+        margin-bottom: 5px;
+    }
+
+    .x-input::before, .y-input::before, .revision-input::before {
+        content: attr(data-label);
+        display: block;
+        font-weight: bold;
+        margin-bottom: 2px;
+    }
+
+    .revision-actions {
+        flex-direction: column;
+        gap: 5px;
+    }
+
+    .accept-btn, .reject-btn {
+        width: 100%;
+        padding: 6px;
+    }
+}
+
